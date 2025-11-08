@@ -135,6 +135,12 @@ bot = commands.Bot(
     loop=loop
 )
 
+# ✅ Debug logoló event — EZT adtuk hozzá
+@bot.event
+async def event_ready():
+    print(f"✅ Bot bejelentkezett: {bot.nick}")
+    print(f"📡 Csatlakozott csatornák: {bot.connected_channels}")
+
 # Host API példány, amit a játékok megkapnak a boton keresztül
 bot.host = HostAPI(_ws_queue)
 
