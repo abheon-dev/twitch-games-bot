@@ -191,11 +191,12 @@ for folder in os.listdir(GAMES_DIR):
 #  Indítás
 # =========================
 async def main():
-    # HTTP külön thread
-    threading.Thread(target=_http_server, daemon=True).start()
-
-    # Indítsd el a Twitch botot először
     print("✅ main_bot.py elindult Renderen")
+
+    # HTTP szerver elindítása asyncio taskként
+    loop.create_task(asyncio.to_thread(_http_server))
+
+    # Indítsd el a Twitch botot
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
     await bot.start()  # ez blokkol, amíg a bot fut
 
