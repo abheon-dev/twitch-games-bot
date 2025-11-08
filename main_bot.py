@@ -195,6 +195,7 @@ async def main():
     threading.Thread(target=_http_server, daemon=True).start()
 
     # Indítsd el a Twitch botot először
+    print("✅ main_bot.py elindult Renderen")
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
     await bot.start()  # ez blokkol, amíg a bot fut
 
