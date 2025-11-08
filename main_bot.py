@@ -190,22 +190,17 @@ for folder in os.listdir(GAMES_DIR):
 # =========================
 #  Indítás
 # =========================
-async def start_all():
+async def main():
     # HTTP külön thread
     threading.Thread(target=_http_server, daemon=True).start()
 
-    # WS szerver + broadcaster külön taskban
-    asyncio.create_task(_ws_server())
-    asyncio.create_task(_ws_broadcaster())
-
-    # Bot indítása (blokkolva)
-    await bot.start()
-
-print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
+    # Indítsd el a Twitch botot először
+    print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
+    await bot.start()  # ez blokkol, amíg a bot fut
 
 if __name__ == "__main__":
     try:
-        loop.run_until_complete(start_all())
+        loop.run_until_complete(main())
     except KeyboardInterrupt:
         print("🛑 Leállítás...")
     except Exception as e:
