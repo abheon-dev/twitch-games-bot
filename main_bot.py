@@ -190,15 +190,23 @@ for folder in os.listdir(GAMES_DIR):
 # =========================
 #  Indítás
 # =========================
+async def heartbeat():
+    while True:
+        print("💓 Bot él és fut Renderen...")
+        await asyncio.sleep(15)
+
 async def main():
     print("✅ main_bot.py elindult Renderen")
 
-    # HTTP szerver elindítása asyncio taskként
+    # HTTP szerver külön szálon
     loop.create_task(asyncio.to_thread(_http_server))
 
-    # Indítsd el a Twitch botot
+    # Heartbeat üzenetek
+    loop.create_task(heartbeat())
+
+    # Twitch bot indítása
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
-    await bot.start()  # ez blokkol, amíg a bot fut
+    await bot.start()
 
 if __name__ == "__main__":
     try:
