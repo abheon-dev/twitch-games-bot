@@ -187,20 +187,26 @@ for folder in os.listdir(GAMES_DIR):
         print(f"[✅] {folder} betöltve.")
     except Exception as e:
         print(f"[⚠️] Nem sikerült betölteni: {folder} → {e}")
-
 # =========================
 #  Indítás
 # =========================
 async def start_all():
     # HTTP külön thread
     threading.Thread(target=_http_server, daemon=True).start()
-    # WS szerver + broadcaster
+
+    # WS szerver + broadcaster külön taskban
     asyncio.create_task(_ws_server())
     asyncio.create_task(_ws_broadcaster())
-    # Bot
+
+    # Bot indítása (blokkolva)
     await bot.start()
 
 print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
 
 if __name__ == "__main__":
-    loop.run_until_complete(start_all())
+    try:
+        loop.run_until_complete(start_all())
+    except KeyboardInterrupt:
+        print("🛑 Leállítás...")
+    except Exception as e:
+        print(f"❌ Hiba a főindítás során: {e}")
