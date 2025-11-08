@@ -200,5 +200,7 @@ async def start_all():
     # Bot
     await bot.start()
 
+print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
+
 if __name__ == "__main__":
     loop.run_until_complete(start_all())
