@@ -187,6 +187,21 @@ for folder in os.listdir(GAMES_DIR):
         print(f"[✅] {folder} betöltve.")
     except Exception as e:
         print(f"[⚠️] Nem sikerült betölteni: {folder} → {e}")
+from flask import Flask
+import threading
+
+# =========================
+#  Flask HTTP szerver
+# =========================
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "✅ Twitch bot is running on Render!"
+
+def run_flask():
+    app.run(host="0.0.0.0", port=8000)
+
 # =========================
 #  Indítás
 # =========================
@@ -195,14 +210,12 @@ async def heartbeat():
         print("💓 Bot él és fut Renderen...")
         await asyncio.sleep(15)
 
-async def main():
-    print("✅ main_bot.py elindult Renderen")
+async def start_all():
+    # Flask szerver külön szálon (Rendernek kell ez a 8000-es port!)
+    threading.Thread(target=run_flask, daemon=True).start()
 
-    # HTTP szerver külön szálon
-    loop.create_task(asyncio.to_thread(_http_server))
-
-    # Heartbeat üzenetek
-    loop.create_task(heartbeat())
+    # Heartbeat (log ellenőrzéshez)
+    asyncio.create_task(heartbeat())
 
     # Twitch bot indítása
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
@@ -210,7 +223,7 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        loop.run_until_complete(main())
+        loop.run_until_complete(start_all())
     except KeyboardInterrupt:
         print("🛑 Leállítás...")
     except Exception as e:
