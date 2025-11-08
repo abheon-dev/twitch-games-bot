@@ -22,6 +22,12 @@ with open(CONFIG_PATH, "r", encoding="utf-8") as f:
 
 TOKEN = os.getenv("TWITCH_TOKEN") or CONFIG.get("TWITCH_TOKEN")
 CHANNEL = os.getenv("TWITCH_CHANNEL") or CONFIG.get("TWITCH_CHANNEL")
+
+# 🔽 Ide jönnek az újak:
+CLIENT_ID = os.getenv("CLIENT_ID") or CONFIG.get("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET") or CONFIG.get("CLIENT_SECRET")
+BOT_ID = os.getenv("BOT_ID") or CONFIG.get("BOT_ID")
+
 GENERAL = CONFIG.get("general", {})
 HTTP_PORT = int(GENERAL.get("HTTP_PORT", 8000))
 WS_PORT = int(GENERAL.get("WS_PORT", 8765))
@@ -122,8 +128,10 @@ def _http_server():
 # =========================
 bot = commands.Bot(
     token=TOKEN,
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    bot_id=BOT_ID,
     prefix="!",
-    initial_channels=[CHANNEL],
     loop=loop
 )
 
