@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Akasztófa Overlay</title>
+<style>
+  html,body{
+    margin:0;padding:0;background:transparent;overflow:hidden;
+    font-family:'Courier New',monospace;color:#fff;text-align:center;
+  }
+  #container{
+    position:absolute;inset:0;
+    background-size:contain;
+    background-repeat:no-repeat;
+    background-position:center;
+    transition:opacity .8s ease;
+  }
+  #category{
+    position:absolute;top:3%;width:100%;
+    font-size:2em;text-shadow:2px 2px 5px #000;
+  }
+  #word{
+    position:absolute;top:8%;width:100%;
+    font-size:3em;letter-spacing:.25em;
+    text-shadow:2px 2px 6px #000;
+  }
+  #wrong{
+    position:absolute;bottom:2%;width:100%;
+    font-size:1.8em;color:#ff5555;font-weight:bold;
+    text-shadow:4px 4px 6px #000,-4px -4px 6px #000,4px -4px 6px #000,-4px 4px 6px #000;
+  }
+
+  /* 😇 Mentőangyal */
+  #angel{
+    position:absolute;top:40%;left:50%;
+    transform:translate(-50%,-50%);
+    font-size:7em;opacity:0;
+    transition:opacity .8s ease;
+    text-shadow:0 0 20px gold,0 0 40px white;
+    animation:float 3s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes float{
+    0%,100%{transform:translate(-50%,-50%) translateY(0);}
+    50%{transform:translate(-50%,-50%) translateY(-15px);}
+  }
+
+  /* 😈 Ördög */
+  #devil{
+    position:absolute;top:60%;left:50%;
+    transform:translate(-50%,-50%);
+    font-size:6em;opacity:0;
+    transition:opacity 0.5s ease;
+    text-shadow:0 0 20px red,0 0 40px black;
+    animation:shake 0.4s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes shake{
+    0%,100%{transform:translate(-50%,-50%) rotate(0deg);}
+    25%{transform:translate(-50%,-50%) rotate(10deg);}
+    75%{transform:translate(-50%,-50%) rotate(-10deg);}
+  }
+  
+  /* 🎉 Győzelem */
+  #victory{
+    position:absolute;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    font-size:8em;opacity:0;
+    transition:opacity .8s ease;
+    text-shadow:0 0 20px gold,0 0 40px yellow;
+    animation:celebrate 2s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes celebrate{
+    0%,100%{transform:translate(-50%,-50%) scale(1) rotate(0deg);}
+    25%{transform:translate(-50%,-50%) scale(1.2) rotate(10deg);}
+    50%{transform:translate(-50%,-50%) scale(1) rotate(0deg);}
+    75%{transform:translate(-50%,-50%) scale(1.2) rotate(-10deg);}
+  }
+  
+  /* Debug információ */
+  #debug{
+    position:absolute;bottom:5px;right:5px;
+    font-size:10px;color:rgba(255,255,255,0.5);
+    background:rgba(0,0,0,0.5);padding:2px;
+    border-radius:3px;display:none;
+  }
+</style>
+</head>
+<body>
+  <div id="container">
+    <div id="category"></div>
+    <div id="word"></div>
+    <div id="wrong"></div>
+    <div id="angel">😇</div>
+    <div id="devil">😈</div>
+    <div id="victory">✔</div>
+  </div>
+  <div id="debug"></div>
+
+<script>
+const c=document.getElementById("container"),
+cat=document.getElementById("category"),
+w=document.getElementById("word"),
+wr=document.getElementById("wrong"),
+a=document.getElementById("angel"),
+dvl=document.getElementById("devil"),
+v=document.getElementById("victory"),
+debug=document.getElementById("debug");
+
+const themes={
+  "temeto":"temeto",
+  "gyertya":"gyertya",
+  "akasztofa":"akasztofa",
+  "szorny":"szorny",
+  "zombik":"zombik"
+};
+const stages={
+  "temeto":5,"gyertya":7,"akasztofa":6,"szorny":4,"zombik":8
+};
+
+let lastData = null;
+
+// Debug mód (D billentyű)
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'd' || e.key === 'D') {
+    debug.style.display = debug.style.display === 'none' ? 'block' : 'none';
+  }
+});
+
+async function update(){
+  try{
+    const response = await fetch("data.json?_=" + Date.now(), { 
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
+    });
+    
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    
+    const d = await response.json();
+    const now = new Date();
+    debug.textContent = `Frissítve: ${now.toLocaleTimeString()}`;
+    
+    if (JSON.stringify(d) !== JSON.stringify(lastData)) {
+      lastData = JSON.parse(JSON.stringify(d));
+      const key=d.theme&&themes[d.theme]?d.theme:null;
+      let stage=0;
+      if(d.lives_status){stage=parseInt(d.lives_status.split("/")[0])||0;}
+      if(key){
+        const b=themes[key];
+        c.style.backgroundImage=`url(${b}_${stage}.png?v=${Date.now()})`;
+        c.style.opacity=1;c.style.display="block";
+      }else{
+        c.style.opacity=0;
+        setTimeout(()=>{c.style.display="none";c.style.backgroundImage="none";},800);
+      }
+      cat.textContent=d.category?d.category.toUpperCase():"";
+      w.textContent=d.word||"";
+      wr.textContent=(d.wrong&&d.wrong.length)?"❌ "+d.wrong.join(" "):"";
+    }
+  }catch(e){
+    console.warn("Hiba a frissítéskor:", e);
+    debug.textContent = `Hiba: ${e.message}`;
+  }
+}
+
+// Azonnali frissítés betöltéskor
+update();
+
+// --- WebSocket kapcsolat ---
+(function(){
+  let wsConnected=false;
+  let fallbackStarted=false;
+
+  function startPolling(){
+    if(fallbackStarted)return;
+    fallbackStarted=true;
+    console.warn("[overlay] WS nincs, fallback indul (1s)...");
+    update();
+    setInterval(update,1000);
+  }
+
+  function connectWebSocket() {
+    try{
+      const ws=new WebSocket("ws://127.0.0.1:8765/");
+      ws.onopen=()=>{console.log("[overlay] WS csatlakozva");wsConnected=true;};
+      ws.onclose=()=>{console.warn("[overlay] WS bontva");wsConnected=false;startPolling();};
+      ws.onerror=(e)=>{console.warn("[overlay] WS hiba",e);wsConnected=false;startPolling();};
+
+      // 🔹 Itt kezeljük az eseményeket
+      ws.onmessage=(msg)=>{
+        try{
+          const data = JSON.parse(msg.data);
+          const eventName = typeof data === "string" ? data : data.event || data;
+          console.log("[WS üzenet]", eventName);
+
+          switch(eventName){
+            case "refresh": update(); break;
+
+            case "game_over":
+              a.style.opacity=0;
+              dvl.style.opacity=0;
+              v.style.opacity=0;
+              break;
+
+            case "angel":
+              a.style.opacity=1;
+              break;
+
+            case "devil":
+              dvl.style.opacity=1;
+              setTimeout(()=>dvl.style.opacity=0,4500);
+              break;
+
+            case "victory":
+              v.style.opacity=1;
+              setTimeout(()=>v.style.opacity=0,6000);
+              break;
+
+            default:
+              console.log("[ismeretlen WS esemény]", eventName);
+              break;
+          }
+        }catch(e){
+          console.warn("WS feldolgozási hiba:", e, msg.data);
+        }
+      };
+    }catch(e){
+      console.error("[overlay] WS kapcsolat sikertelen:", e);
+      startPolling();
+    }
+  }
+
+  connectWebSocket();
+})();
+</script>
+
+<!-- WebSocket eseménykezelés hozzáadva (kinézet érintetlenül hagyva) -->
+<script>
+try {
+  const socket = new WebSocket("ws://127.0.0.1:8765/");
+
+  socket.onopen = () => console.log("[overlay] WS kapcsolat létrejött.");
+  socket.onclose = () => console.warn("[overlay] WS lezárva.");
+  socket.onerror = () => console.warn("[overlay] WS hiba.");
+
+  socket.onmessage = (msg) => {
+    try {
+      const data = JSON.parse(msg.data);
+      const event = data.event || data.type || data;
+      if (!event) return;
+
+      switch (event) {
+        case "refresh":
+          if (typeof updateData === "function") updateData();
+          break;
+        case "angel":
+          if (typeof showAngel === "function") showAngel();
+          // NE tűnjön el automatikusan – csak game_over esetén tűnik el
+          break;
+        case "devil":
+          if (typeof showDevil === "function") showDevil();
+          break;
+        case "victory":
+          if (typeof showVictory === "function") showVictory();
+          break;
+        case "game_over":
+          const els = ["category", "word", "wrong", "lives", "state"];
+          for (const id of els) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = "";
+          }
+          const imgs = document.querySelectorAll("img");
+          imgs.forEach(img => img.style.opacity = 0);
+          break;
+        default:
+          console.log("[overlay] ismeretlen esemény:", event);
+      }
+    } catch (err) {
+      console.error("[overlay] Hibás WS üzenet:", msg.data);
+    }
+  };
+} catch (e) {
+  console.error("[overlay] WS inicializálás sikertelen:", e);
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amoeba Overlay</title>
+  <style>
+    body {
+      background-color: rgba(0, 0, 0, 0.85);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      font-family: Consolas, monospace;
+    }
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #fff;
+    }
+
+    #board {
+      display: none; /* 🔧 alapból rejtve */
+      gap: 2px;
+      background-color: #222;
+      padding: 8px;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(255,255,255,0.15);
+      transition: all 0.3s ease;
+    }
+
+    .cell {
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .coord {
+      font-size: 12px;
+      color: #ccc;
+      text-shadow: 1px 1px 2px black;
+      user-select: none;
+      background-color: rgba(0,0,0,0.3);
+      border-radius: 4px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #victory {
+      font-size: 36px;
+      font-weight: bold;
+      margin-top: 15px;
+      color: #00ff88;
+      text-shadow: 0 0 12px #00ff88, 0 0 24px #00ff88;
+      display: none;
+      animation: flash 1s infinite alternate;
+    }
+
+    @keyframes flash {
+      from { opacity: 1; }
+      to { opacity: 0.5; }
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="board"></div>
+    <div id="victory"></div>
+  </div>
+
+  <script>
+    const boardEl = document.getElementById("board");
+    const victoryEl = document.getElementById("victory");
+    let lastWinnerTime = null;
+
+    async function fetchData() {
+      try {
+        const res = await fetch("data.json?_=" + Date.now());
+        const data = await res.json();
+        updateBoard(data);
+      } catch (err) {}
+    }
+
+    function updateBoard(data) {
+      if (!data || !data.board || !Array.isArray(data.board) || data.board.length === 0) {
+        boardEl.style.display = "none";
+        boardEl.innerHTML = "";
+        victoryEl.style.display = "none";
+        lastWinnerTime = null;
+        return;
+      }
+
+      boardEl.style.display = "grid";
+
+      const rows = data.board.length;
+      const cols = data.board[0].length;
+      const isConnect4 = (rows === 6 && cols === 7);
+
+      const cellSize = isConnect4 ? 40 : 24;
+      boardEl.style.gap = isConnect4 ? "3px" : "2px";
+
+      // rács felépítése
+      let html = "";
+
+      // felső koordináták
+      html += `<div></div>`;
+      for (let c = 0; c < cols; c++) {
+        html += `<div class="coord" style="font-size:${isConnect4 ? 16 : 12}px">${isConnect4 ? (c + 1) : String.fromCharCode(65 + c)}</div>`;
+      }
+
+      // rács soronként
+      for (let r = 0; r < rows; r++) {
+        // bal oldali koordináta – csak az amoebánál
+        if (!isConnect4) {
+          html += `<div class="coord" style="font-size:12px">${r + 1}</div>`;
+        } else {
+          html += `<div></div>`;
+        }
+
+        for (let c = 0; c < cols; c++) {
+          const value = data.board[r][c] || "";
+          html += `<div class="cell" style="width:${cellSize}px;height:${cellSize}px;font-size:${isConnect4 ? 28 : 20}px">${value}</div>`;
+        }
+      }
+
+      // alsó koordináták – csak az amoebánál
+      if (!isConnect4) {
+        html += `<div></div>`;
+        for (let c = 0; c < cols; c++) {
+          html += `<div class="coord" style="font-size:12px">${String.fromCharCode(65 + c)}</div>`;
+        }
+      }
+
+      boardEl.innerHTML = html;
+      boardEl.style.gridTemplateColumns = `repeat(${cols + 1}, ${cellSize}px)`;
+      boardEl.style.gridTemplateRows = `repeat(${rows + (isConnect4 ? 1 : 2)}, ${cellSize}px)`;
+
+      // győzelem/döntetlen kijelzés
+      if (data.winner) {
+        victoryEl.textContent =
+          data.winner === "Döntetlen" ? "🤝 Döntetlen!" : `🏆 ${data.winner} nyert!`;
+        victoryEl.style.display = "block";
+        lastWinnerTime = Date.now();
+      }
+
+      // 8 mp után automatikus törlés
+      if (lastWinnerTime && Date.now() - lastWinnerTime > 8000) {
+        boardEl.style.display = "none";
+        boardEl.innerHTML = "";
+        victoryEl.style.display = "none";
+        lastWinnerTime = null;
+      }
+    }
+
+    setInterval(fetchData, 1000);
+    fetchData();
+  </script>
+</body>
+</html>

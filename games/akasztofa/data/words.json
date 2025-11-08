@@ -1,0 +1,45 @@
+{
+  "Szörny": [
+    "vámpír", "démon", "zombi", "szellem", "farkasember", "kobold", "nagyláb",
+    "kísértet", "mumus", "markoláb", "lidérc", "mátranováki fanyűvő", "chupacabra",
+    "cerberus", "minotaurusz", "leviatán", "kraken", "drakula", "wendigo", "kiméra",
+    "baziliszkusz", "pulgaszari", "múmja", "xenomorph", "mutáns", "parazita",
+    "torzszülött", "slenderman", "freddy krueger", "jason voorhees", "pennywise",
+    "chucky", "predator", "cenobita", "babadook", "frankenstein", "láthatatlan ember",
+    "norman bates", "michael myers", "bőrpofa", "ghostface", "hannibal lecter",
+    "pinhead", "annabelle", "samara", "kayako", "graboid", "demogorgon", "kampókéz",
+    "sadako", "árnylény", "skinwalker", "piramisfej", "rézfaszú bagoly",
+    "vasorrú bába", "krampusz", "baba jaga", "fejetlen lovas"
+  ],
+  "Tárgy": [
+    "totem", "koporsó", "láncfűrész", "gyertya", "temetőkapu", "machete", "konyhakés",
+    "balta", "kampó", "vasvilla", "kötél", "sírkő", "gyertyatartó", "koponya", "maszk",
+    "amulett", "játékbaba", "tükör", "fűrész", "puska", "kasza", "akasztófa", "fejsze",
+    "bozótvágó", "fecskendő", "kalapács", "kamera", "zseblámpa", "generátor", "kulcs",
+    "lakat", "mobiltelefon", "szögesdrót", "szike", "bábfigura", "feszítővas"
+  ],
+  "Helyszín": [
+    "sírkert", "pince", "katakomba", "kísértetkastély", "kripta", "barlang", "pokol",
+    "alvilág", "másvilág", "tenger", "világítótorony", "labirintus", "csatorna", "nostromo",
+    "padlás", "szanatórium", "mocsár", "motel", "metróalagút", "hullaház", "dzsungel",
+    "elhagyatott ház", "boncterem", "kolostor", "sötét erdő", "erdei kunyhó",
+    "indián temető", "parkolóház", "vidámpark", "sikátor", "bevásárlóközpont", "templom",
+    "kísértetváros", "börtön", "bates motel", "overlook szálló", "elm utca",
+    "raccoon city", "woodsboro", "árvaház"
+  ],
+  "Filmcím": [
+    "ragyogás", "psycho", "halloween", "sikoly", "démonok", "ördögűző", "alien",
+    "holtak hajnala", "holtak éjszakája", "holtak napja", "holtak földje", "holtak naplója",
+    "fűrész", "jelek", "hang nélkül", "apáca", "démonok között", "barlang", "vaksötét",
+    "ragadozó", "predator", "másvilág", "drakula", "múmia", "farkasember", "madarak",
+    "texasi láncfűrészes", "gonosz halott", "aki bújt", "csapatleépítés", "szörnyecskék",
+    "rémecskék", "hullajó", "zombieland", "beetlejuice", "addams family", "árnyék nélkül",
+    "halott menyasszony", "cloverfield", "tremors", "barbár", "mosolyogj", "fekete víz",
+    "tükrök", "pearl", "vámpírok bálja", "vámpír brooklynban", "gyilkos túra",
+    "frankenweenie", "event horizon", "pandorum", "pitch black", "paranorman",
+    "hókusz pókusz", "ördögi denevér", "láthatatlan kísértet", "hasznos holmik",
+    "kedvencek temetője", "frászkarika", "gyerekjáték", "carrie", "álom doktor",
+    "fehér éjszakák", "hatodik érzék", "nosferatu", "kaptár", "toxikus bosszúálló",
+    "kocka", "cápavihar"
+  ]
+}

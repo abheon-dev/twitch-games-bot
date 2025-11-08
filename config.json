@@ -1,0 +1,19 @@
+{
+  "TWITCH_TOKEN": "oauth:xymlf22egkqfykayf6c987pxu4w7ok",
+  "TWITCH_CHANNEL": "Gixing",
+
+  "akasztofa": {
+    "PERSONAL_TIPP_COOLDOWN": 5,
+    "GLOBAL_TIPP_COOLDOWN": 2,
+    "NEW_GAME_COOLDOWN": 180,
+    "GAME_DURATION": 1200,
+    "ANGEL_CHANCE": 15,
+    "DEVIL_CHANCE": 5
+  },
+
+  "general": {
+    "WS_PORT": 8765,
+    "HTTP_PORT": 8000,
+    "DEBUG": false
+  }
+}
