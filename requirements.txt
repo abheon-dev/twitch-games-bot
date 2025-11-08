@@ -4,3 +4,4 @@ websockets
 aiohttp
 asyncio
 python-dotenv
+flask
