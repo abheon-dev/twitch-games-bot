@@ -1,4 +1,4 @@
-twitchio
+twitchio==2.7.0
 requests
 websockets
 aiohttp
