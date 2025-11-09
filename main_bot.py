@@ -73,35 +73,17 @@ async def heartbeat():
         print("💓 Bot él és fut Renderen...")
         await asyncio.sleep(15)
 
+# =========================
+#  Indítás
+# =========================
 async def main():
     print("✅ main_bot.py elindult Renderen")
 
-    # Flask szerver külön szálon
-    threading.Thread(
-        target=lambda: socketio.run(app, host="0.0.0.0", port=HTTP_PORT, allow_unsafe_werkzeug=True),
-        daemon=True
-    ).start()
+    # HTTP szerver külön szálon
+    threading.Thread(target=_http_server, daemon=True).start()
 
-    # Heartbeat elindítása
+    # Heartbeat üzenetek
     loop.create_task(heartbeat())
-
-    # Automatikus modulbetöltés a /games könyvtárból
-    import importlib.util
-
-    GAMES_PATH = os.path.join(os.path.dirname(__file__), "games")
-
-    try:
-        for folder in os.listdir(GAMES_PATH):
-            module_file = os.path.join(GAMES_PATH, folder, "bot.py")
-            if os.path.isfile(module_file):
-                module_name = f"games.{folder}.bot"
-                try:
-                    bot.load_module(module_name)
-                    print(f"[✅] {folder} modul automatikusan betöltve.")
-                except Exception as e:
-                    print(f"[⚠️] Hiba a {folder} modul betöltésénél: {e}")
-    except Exception as e:
-        print(f"[❌] Modulok automatikus betöltése nem sikerült: {e}")
 
     # Twitch bot indítása
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
