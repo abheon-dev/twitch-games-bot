@@ -42,7 +42,6 @@ bot = commands.Bot(
     loop=loop
 )
 
-# Példa parancsok
 @bot.command(name="jatekok")
 async def games_list(ctx):
     await ctx.send("🎮 Elérhető játékok: akasztofa, amoeba")
@@ -83,18 +82,24 @@ async def main():
         daemon=True
     ).start()
 
-    # Heartbeat és bot
+    # Heartbeat elindítása
     loop.create_task(heartbeat())
 
-    # Játékmodulok explicit betöltése a start előtt
+    # Automatikus modulbetöltés a /games könyvtárból
+    import importlib
     try:
-        bot.load_module("games.akasztofa.bot")
-        print("[✅] akasztofa modul kézzel betöltve")
-        bot.load_module("games.amoeba.bot")
-        print("[✅] amoeba modul kézzel betöltve")
+        for folder in os.listdir("games"):
+            module_path = f"games.{folder}.bot"
+            if os.path.exists(f"games/{folder}/bot.py"):
+                try:
+                    bot.load_module(module_path)
+                    print(f"[✅] {folder} modul automatikusan betöltve.")
+                except Exception as e:
+                    print(f"[⚠️] Hiba a {folder} modul betöltésénél: {e}")
     except Exception as e:
-        print(f"⚠️ Hiba a modul betöltésnél: {e}")
+        print(f"[❌] Modulok automatikus betöltése nem sikerült: {e}")
 
+    # Twitch bot indítása
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
     await bot.start()
 
