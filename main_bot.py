@@ -86,6 +86,15 @@ async def main():
     # Heartbeat és bot
     loop.create_task(heartbeat())
 
+    # Játékmodulok explicit betöltése a start előtt
+    try:
+        bot.load_module("games.akasztofa.bot")
+        print("[✅] akasztofa modul kézzel betöltve")
+        bot.load_module("games.amoeba.bot")
+        print("[✅] amoeba modul kézzel betöltve")
+    except Exception as e:
+        print(f"⚠️ Hiba a modul betöltésnél: {e}")
+
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
     await bot.start()
 
