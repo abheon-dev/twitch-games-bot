@@ -86,13 +86,17 @@ async def main():
     loop.create_task(heartbeat())
 
     # Automatikus modulbetöltés a /games könyvtárból
-    import importlib
+    import importlib.util
+
+    GAMES_PATH = os.path.join(os.path.dirname(__file__), "games")
+
     try:
-        for folder in os.listdir("games"):
-            module_path = f"games.{folder}.bot"
-            if os.path.exists(f"games/{folder}/bot.py"):
+        for folder in os.listdir(GAMES_PATH):
+            module_file = os.path.join(GAMES_PATH, folder, "bot.py")
+            if os.path.isfile(module_file):
+                module_name = f"games.{folder}.bot"
                 try:
-                    bot.load_module(module_path)
+                    bot.load_module(module_name)
                     print(f"[✅] {folder} modul automatikusan betöltve.")
                 except Exception as e:
                     print(f"[⚠️] Hiba a {folder} modul betöltésénél: {e}")
