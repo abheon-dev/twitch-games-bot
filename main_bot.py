@@ -127,12 +127,11 @@ def _http_server():
 #  Twitch bot
 # =========================
 bot = commands.Bot(
-    token=TOKEN,
+    irc_token=TOKEN,
     client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    bot_id=BOT_ID,
+    nick="gixing",
     prefix="!",
-    loop=loop
+    initial_channels=[CHANNEL]
 )
 
 # ✅ Debug logoló event — EZT adtuk hozzá
