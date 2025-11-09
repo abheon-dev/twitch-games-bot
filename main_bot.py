@@ -1,12 +1,12 @@
 import os
-import threading
 import asyncio
+import threading
 from twitchio.ext import commands
 from flask import Flask
 import socketio
 
 # =========================
-#  Alap beállítások
+#  Beállítások
 # =========================
 TOKEN = os.getenv("TOKEN")
 CHANNEL = os.getenv("CHANNEL")
@@ -20,14 +20,15 @@ HTTP_PORT = 8000
 #  Flask + SocketIO
 # =========================
 app = Flask(__name__)
-socketio = socketio.Server(async_mode='threading', cors_allowed_origins="*")
+sio = socketio.Server(async_mode="threading", cors_allowed_origins="*")
+app.wsgi_app = socketio.WSGIApp(sio, app.wsgi_app)
 
 @app.route("/")
-def index():
-    return "Bot online!"
+def home():
+    return "Bot online és fut a Renderen!"
 
 # =========================
-#  Twitch bot
+#  Twitch Bot
 # =========================
 bot = commands.Bot(
     token=TOKEN,
@@ -46,7 +47,7 @@ try:
             bot.load_module(f"games.{folder}.bot")
             print(f"[✅] {folder} betöltve.")
 except Exception as e:
-    print(f"[⚠️] Modulbetöltés hiba: {e}")
+    print(f"[⚠️] Hiba a modulok betöltésénél: {e}")
 
 # =========================
 #  Heartbeat
@@ -62,19 +63,17 @@ async def heartbeat():
 async def main():
     print("✅ main_bot.py elindult Renderen")
 
-    # Flask szerver külön szálon
+    # Flask külön szálon (a működő rész!)
     threading.Thread(
-        target=lambda: socketio.run(app, host="0.0.0.0", port=HTTP_PORT, allow_unsafe_werkzeug=True),
+        target=lambda: sio.run(app, host="0.0.0.0", port=HTTP_PORT, allow_unsafe_werkzeug=True),
         daemon=True
     ).start()
 
-    # Heartbeat üzenetek
+    # Heartbeat
     loop.create_task(heartbeat())
 
-    # Twitch bot indítása
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
     await bot.start()
-
 
 if __name__ == "__main__":
     try:
