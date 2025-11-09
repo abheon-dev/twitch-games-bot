@@ -1,72 +1,55 @@
 import os
-import json
-import asyncio
 import threading
+import asyncio
 from twitchio.ext import commands
-from flask import Flask, send_from_directory
-from flask_socketio import SocketIO
+from flask import Flask
+import socketio
 
 # =========================
-#  Konfiguráció
+#  Alap beállítások
 # =========================
-CONFIG_PATH = "config.json"
-if not os.path.exists(CONFIG_PATH):
-    print("❌ Nincs config.json!")
-    input()
-    raise SystemExit
-
-with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-    CONFIG = json.load(f)
-
-TOKEN = os.getenv("TWITCH_TOKEN") or CONFIG.get("TWITCH_TOKEN")
-CHANNEL = os.getenv("TWITCH_CHANNEL") or CONFIG.get("TWITCH_CHANNEL")
-GENERAL = CONFIG.get("general", {})
-HTTP_PORT = int(GENERAL.get("HTTP_PORT", 8000))
-
-if not TOKEN or not CHANNEL:
-    print("❌ Hiányzik a TWITCH_TOKEN vagy TWITCH_CHANNEL (env vagy config.json)!")
-    input()
-    raise SystemExit
-
-print(f"🔹 TOKEN és CHANNEL betöltve: {CHANNEL}")
+TOKEN = os.getenv("TOKEN")
+CHANNEL = os.getenv("CHANNEL")
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
 
 loop = asyncio.get_event_loop()
+HTTP_PORT = 8000
+
+# =========================
+#  Flask + SocketIO
+# =========================
+app = Flask(__name__)
+socketio = socketio.Server(async_mode='threading', cors_allowed_origins="*")
+
+@app.route("/")
+def index():
+    return "Bot online!"
 
 # =========================
 #  Twitch bot
 # =========================
 bot = commands.Bot(
-    token=TOKEN,
+    irc_token=TOKEN,
+    client_id=CLIENT_ID,
+    nick=CHANNEL,
     prefix="!",
-    initial_channels=[CHANNEL],
-    loop=loop
+    initial_channels=[CHANNEL]
 )
 
-@bot.command(name="jatekok")
-async def games_list(ctx):
-    await ctx.send("🎮 Elérhető játékok: akasztofa, amoeba")
+# =========================
+#  Modulok betöltése
+# =========================
+try:
+    for folder in os.listdir("games"):
+        if os.path.exists(f"games/{folder}/bot.py"):
+            bot.load_module(f"games.{folder}.bot")
+            print(f"[✅] {folder} betöltve.")
+except Exception as e:
+    print(f"[⚠️] Modulbetöltés hiba: {e}")
 
 # =========================
-#  Flask + SocketIO szerver
-# =========================
-app = Flask(__name__, static_folder="overlay")
-socketio = SocketIO(app, cors_allowed_origins="*")
-
-@app.route('/')
-def index():
-    return "Twitch bot és overlay szerver fut 🎮"
-
-@app.route('/<path:filename>')
-def serve_overlay(filename):
-    overlay_root = os.path.join(os.getcwd(), "overlay")
-    return send_from_directory(overlay_root, filename)
-
-@socketio.on('connect')
-def handle_connect():
-    print("🟢 Overlay csatlakozott WebSocketen")
-
-# =========================
-#  Heartbeat + fő indítás
+#  Heartbeat
 # =========================
 async def heartbeat():
     while True:
@@ -79,8 +62,11 @@ async def heartbeat():
 async def main():
     print("✅ main_bot.py elindult Renderen")
 
-    # HTTP szerver külön szálon
-    threading.Thread(target=_http_server, daemon=True).start()
+    # Flask szerver külön szálon
+    threading.Thread(
+        target=lambda: socketio.run(app, host="0.0.0.0", port=HTTP_PORT, allow_unsafe_werkzeug=True),
+        daemon=True
+    ).start()
 
     # Heartbeat üzenetek
     loop.create_task(heartbeat())
@@ -88,6 +74,7 @@ async def main():
     # Twitch bot indítása
     print("🚀 Bot indul, Twitch kapcsolat kezdeményezése...")
     await bot.start()
+
 
 if __name__ == "__main__":
     try:
