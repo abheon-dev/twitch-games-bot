@@ -127,9 +127,7 @@ def _http_server():
 #  Twitch bot
 # =========================
 bot = commands.Bot(
-    irc_token=TOKEN,
-    client_id=CLIENT_ID,
-    nick="gixing",
+    token=TOKEN,
     prefix="!",
     initial_channels=[CHANNEL]
 )
