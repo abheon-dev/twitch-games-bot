@@ -5,3 +5,4 @@ aiohttp
 asyncio
 python-dotenv
 flask
+flask-socketio
