@@ -30,7 +30,7 @@ def index():
 #  Twitch bot
 # =========================
 bot = commands.Bot(
-    irc_token=TOKEN,
+    token=TOKEN,
     client_id=CLIENT_ID,
     nick=CHANNEL,
     prefix="!",
